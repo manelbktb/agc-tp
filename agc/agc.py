@@ -161,8 +161,7 @@ def abundance_greedy_clustering(amplicon_file: Path, minseqlen: int, mincount: i
                                         matrix=str(Path("/home/etudiant/meta1/agc/MATCH").parent / "MATCH"))
             aligned_sequence, aligned_otu_sequence = alignment
 
-            identical_count = sum(a == b for a, b in zip(aligned_sequence, aligned_otu_sequence))
-            identity = (identical_count / len(aligned_sequence)) * 100.0
+            identity = get_identity(alignment)
 
             if identity > 97:
                 is_similar = True
@@ -172,6 +171,8 @@ def abundance_greedy_clustering(amplicon_file: Path, minseqlen: int, mincount: i
             otu_list.append((sequence, count))
 
     return otu_list
+    
+    
 def write_OTU(OTU_list: List, output_file: Path) -> None:
     """Write the OTU sequence in fasta format.
 
