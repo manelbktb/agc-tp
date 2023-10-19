@@ -94,7 +94,7 @@ def read_fasta(amplicon_file: Path, minseqlen: int) -> Iterator[str]:
             else:
                 sequence += line
         if sequence and len(sequence) >= minseqlen:
-            yield 
+            yield sequence
             
             
 def dereplication_fulllength(amplicon_file: Path, minseqlen: int, mincount: int) -> Iterator[List]:
@@ -120,13 +120,21 @@ def dereplication_fulllength(amplicon_file: Path, minseqlen: int, mincount: int)
         yield [sequence, count]
 
 
+
 def get_identity(alignment_list: List[str]) -> float:
     """Compute the identity rate between two sequences
 
     :param alignment_list:  (list) A list of aligned sequences in the format ["SE-QUENCE1", "SE-QUENCE2"]
     :return: (float) The rate of identity between the two sequences.
     """
-    pass
+    sequence_1 = alignment_list[0]
+    sequence_2 = alignment_list[1]
+    nb_id = 0
+    for i in range(len(alignment_list[0])):
+        if sequence_1[i] == sequence_2[i]:
+            nb_id +=1
+    id = nb_id/len(sequence_1)
+    return id*100
 
 def abundance_greedy_clustering(amplicon_file: Path, minseqlen: int, mincount: int, chunk_size: int, kmer_size: int) -> List:
     """Compute an abundance greedy clustering regarding sequence count and identity.
