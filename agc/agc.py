@@ -19,6 +19,7 @@ import os
 import gzip
 import statistics
 import textwrap
+import numpy as np
 from pathlib import Path
 from collections import Counter
 from typing import Iterator, Dict, List
@@ -130,12 +131,12 @@ def get_identity(alignment_list: List[str]) -> float:
     sequence_1 = alignment_list[0]
     sequence_2 = alignment_list[1]
     nb_id = 0
-    for i in range(len(alignment_list[0])):
+    for i in range(len(sequence_1)):
         if sequence_1[i] == sequence_2[i]:
-            nb_id +=1
-    id = nb_id/len(sequence_1)
-    return id*100
-
+            nb_id += 1
+    identity_rate = (nb_id / len(sequence_1)) * 100
+    return identity_rate
+ 
 def abundance_greedy_clustering(amplicon_file: Path, minseqlen: int, mincount: int, chunk_size: int, kmer_size: int) -> List:
     """Compute an abundance greedy clustering regarding sequence count and identity.
     Identify OTU sequences.
@@ -147,16 +148,45 @@ def abundance_greedy_clustering(amplicon_file: Path, minseqlen: int, mincount: i
     :param kmer_size: (int) A fournir mais non utilise cette annee
     :return: (list) A list of all the [OTU (str), count (int)] .
     """
-    pass
+    otu_list = [] 
+    np.int = int
 
+    unique_sequences = list(dereplication_fulllength(amplicon_file, minseqlen, mincount))
 
+    for sequence, count in unique_sequences:
+        is_similar = False
+
+        for otu_sequence, otu_count in otu_list:
+            alignment = nw.global_align(sequence, otu_sequence, gap_open=-1, gap_extend=-1, 
+                                        matrix=str(Path("/home/etudiant/meta1/agc/MATCH").parent / "MATCH"))
+            aligned_sequence, aligned_otu_sequence = alignment
+
+            identical_count = sum(a == b for a, b in zip(aligned_sequence, aligned_otu_sequence))
+            identity = (identical_count / len(aligned_sequence)) * 100.0
+
+            if identity > 97:
+                is_similar = True
+                break
+
+        if not is_similar:
+            otu_list.append((sequence, count))
+
+    return otu_list
 def write_OTU(OTU_list: List, output_file: Path) -> None:
     """Write the OTU sequence in fasta format.
 
     :param OTU_list: (list) A list of OTU sequences
     :param output_file: (Path) Path to the output file
     """
-    pass
+    with output_file.open('w') as file:
+        otu_num = 1
+
+        for sequence, occurrence in OTU_list:
+            file.write(f'>OTU_{otu_num} occurrence:{occurrence}\n')
+            formatted_sequence = textwrap.fill(sequence, width=80)
+            file.write(f'{formatted_sequence}\n')
+            otu_num += 1
+
 
 
 #==============================================================
