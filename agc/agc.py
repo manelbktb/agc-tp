@@ -94,10 +94,9 @@ def read_fasta(amplicon_file: Path, minseqlen: int) -> Iterator[str]:
             else:
                 sequence += line
         if sequence and len(sequence) >= minseqlen:
-            yield sequence
-
-
-from collections import defaultdict
+            yield 
+            
+            
 def dereplication_fulllength(amplicon_file: Path, minseqlen: int, mincount: int) -> Iterator[List]:
     """Dereplicate the set of sequence
 
